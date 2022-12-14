@@ -6,7 +6,6 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required, creat
 import datetime
 
 from db import db
-from blocklist import BLOCKLIST
 from models import UserModel, JWTRevokedModel
 
 blp = Blueprint("Users", "users", description="Operations on users")
@@ -73,6 +72,5 @@ class UserLogout(MethodView):
     def post(self):
         jti = JWTRevokedModel(jti= get_jwt()["jti"])
         db.session.add(jti)
-        db.session.commit()
-        # BLOCKLIST.add(jti)        
+        db.session.commit()             
         return {"message": "User logged out."}
