@@ -1,0 +1,10 @@
+.venv
+.venv_home
+blocklist.py
+comands.txt
+instance
+__pycache__
+first_rest_API.code-workspace
+migrations
+*.pyc
+.DS_Store
