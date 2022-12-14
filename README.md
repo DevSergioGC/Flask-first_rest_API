@@ -1,3 +1,3 @@
-#Flask Smorest Rest API
+# Flask Smorest Rest API
 
 flask course
