@@ -4,11 +4,24 @@ from schemas import UserSchema
 from passlib.hash import pbkdf2_sha256 as hasher
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required, create_refresh_token, get_jwt_identity
 import datetime
+import requests
+import os
 
 from db import db
 from models import UserModel, JWTRevokedModel
 
 blp = Blueprint("Users", "users", description="Operations on users")
+
+def send_simple_message(to, subject, body):
+    domain = os.getenv("MAILGUN_DOMAIN")    
+    
+    return requests.post(
+		f"https://api.mailgun.net/v3/{domain}/messages",
+		auth=("api", os.getenv("MAILGUN_API_KEY")),
+		data={"from": f"Sergio Guzmán <mailgun@{domain}>",
+			"to": [to],
+			"subject": [subject],
+			"text": [body]})
 
 @blp.route("/register")
 class UserRegister(MethodView):
