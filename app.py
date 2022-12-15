@@ -3,6 +3,7 @@ from flask_smorest import Api
 import os
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 from db import db
 from models import JWTRevokedModel
@@ -15,6 +16,8 @@ from resources.jwt_list import blp as RevokedJWTBlueprint
 
 def create_app(db_url=None):
     app = Flask(__name__)
+    load_dotenv()
+    
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
@@ -86,9 +89,6 @@ def create_app(db_url=None):
                 "error": "authorization_required"
             }), 401
         )
-
-    # with app.app_context():
-    #     db.create_all()
     
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)
