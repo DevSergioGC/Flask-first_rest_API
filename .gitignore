@@ -1,3 +1,4 @@
+.env
 .venv
 .venv_home
 blocklist.py
