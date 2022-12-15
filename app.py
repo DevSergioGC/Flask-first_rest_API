@@ -18,7 +18,8 @@ def create_app(db_url=None):
     app = Flask(__name__)
     load_dotenv()
     
-    app.config["PROPAGATE_EXCEPTIONS"] = True
+    #* App configuration
+    
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.3"
@@ -27,10 +28,14 @@ def create_app(db_url=None):
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url or os.getenv("DATABASE_URL", "sqlite:///data.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["PROPAGATE_EXCEPTIONS"] = True
     db.init_app(app)
     migrate = Migrate(app, db)
-    
     api = Api(app)
+    
+    #* End app configuration
+    
+    #* JWT Configuration
     
     app.config["JWT_SECRET_KEY"] = "jose"
     jwt = JWTManager(app)
@@ -62,12 +67,12 @@ def create_app(db_url=None):
             )
         )
     
-    @jwt.additional_claims_loader
-    def add_claims_to_jwt(identity):
-        #! Look in the database and see whether the user is an admin. This is just an example
-        if identity == 1:
-            return {"is_admin": True}
-        return {"is_admin": False}
+    # @jwt.additional_claims_loader
+    # def add_claims_to_jwt(identity):
+    #     #! Look in the database and see whether the user is an admin. This is just an example
+    #     if identity == 1:
+    #         return {"is_admin": True}
+    #     return {"is_admin": False}
     
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
@@ -89,6 +94,8 @@ def create_app(db_url=None):
                 "error": "authorization_required"
             }), 401
         )
+    
+    #* end JWT Configuration
     
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)
