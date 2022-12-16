@@ -44,3 +44,6 @@ class UserSchema(Schema):
 class RevokedJWTSchema(Schema):
     id = fields.Int(dump_only=True)
     jti = fields.Str(required=True)
+    
+class UserRegisterSchema(UserSchema):
+    email = fields.Str(required=True)

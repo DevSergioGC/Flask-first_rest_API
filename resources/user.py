@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from schemas import UserSchema
+from schemas import UserSchema, UserRegisterSchema
 from passlib.hash import pbkdf2_sha256 as hasher
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required, create_refresh_token, get_jwt_identity
 import datetime
@@ -8,6 +8,7 @@ import requests
 import os
 
 from db import db
+from sqlalchemy import or_
 from models import UserModel, JWTRevokedModel
 
 blp = Blueprint("Users", "users", description="Operations on users")
@@ -25,18 +26,28 @@ def send_simple_message(to, subject, body):
 
 @blp.route("/register")
 class UserRegister(MethodView):
-    @blp.arguments(UserSchema)
+    @blp.arguments(UserRegisterSchema)
     def post(self, user_data):
-        if UserModel.query.filter(UserModel.username == user_data["username"]).first():
-            abort(409, message="A user with thtat username already exists")
+        if UserModel.query.filter(
+            or_(
+                UserModel.username == user_data["username"], 
+                UserModel.email == user_data["email"]
+            )).first():
+            abort(409, message="A user with thtat username or email already exists")
         
         user = UserModel(
             username = user_data["username"], 
+            email = user_data["email"],
             password = hasher.hash(user_data["password"])
         )
         
         db.session.add(user)
         db.session.commit()
+        send_simple_message(
+            to=user.email,
+            subject="Successfully signed up",
+            body= f"Hi {user.username}! You have successfully signed up to the Stores Rest API."
+        )
         
         return {"message": "User created successfully"}, 201
 
