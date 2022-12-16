@@ -5,6 +5,9 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 
+import redis 
+from rq import Queue
+
 from db import db
 from models import JWTRevokedModel
 
@@ -20,6 +23,8 @@ def create_app(db_url=None):
     
     #* App configuration
     
+    connection = redis.from_url(os.getenv("REDIS_URL"))
+    app.queue = Queue("emails", connection=connection)
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.3"
