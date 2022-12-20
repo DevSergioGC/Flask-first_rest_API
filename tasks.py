@@ -27,8 +27,8 @@ def send_simple_message(to, subject, body, html):
 
 def send_user_registration_email(email, username):
     return send_simple_message(
-        email,
-        "Successfully signed up",
-        f"Hi {username}! You have successfully signed up to the Stores REST API.",
-        render_template("email/action.html", username=username)
+        to = email,
+        subject = "Successfully signed up",
+        body = f"Hi {username}! You have successfully signed up to the Stores REST API.",
+        html = render_template("email/action.html", username=username)
     )
